@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ClassLibrary1
+namespace ClassLibrary
 {
     /// <summary>
     /// Time struct constructor needs at least one input value, otherwise auto generated constructor will be called and fields would be filled by default values (0)
@@ -16,19 +16,28 @@ namespace ClassLibrary1
         public byte Minutes => minutes;
         ///<value>Gets number of seconds in Time struct</value>
         public byte Seconds => seconds;
+        /// <summary>
+        /// Correct range of input is: 0-23, other input value will cause exception to be thrown; minutes and seconds value will be 0 by default
+        /// </summary>
+        /// <param name="hours"></param>
         public Time(byte hours)
         {
-            if(hours > 23 || hours < 0)
+            if (hours > 23 || hours < 0)
                 throw new Exception("input value out of range");
             this.hours = hours;
             this.minutes = 0;
             this.seconds = 0;
         }
+        /// <summary>
+        /// Correct range of input is: 0-23 for hours, 0-59 for minutes, other input value will cause exception to be thrown; seconds value will be 0 by default
+        /// </summary>
+        /// <param name="hours"></param>
+        /// <param name="minutes"></param>
         public Time(byte hours, byte minutes)
         {
             if (hours > 23 || hours < 0)
                 throw new Exception("input value out of range");
-            if(minutes > 59 || minutes <0)
+            if (minutes > 59 || minutes < 0)
                 throw new Exception("input value out of range");
             this.hours = hours;
             this.minutes = minutes;
@@ -138,27 +147,70 @@ namespace ClassLibrary1
             else
                 return false;
         }
+        /// <summary>
+        /// Returns new Time which is equal to old Time after inputed TimePeriod passed
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="tp"></param>
+        /// <returns></returns>
+        public static Time operator +(Time t, TimePeriod tp) => t.AddTimePeriod(tp);
+ 
+        //public static Time operator -(Time t1, TimePeriod t2)
+        //{
 
-        public static Time operator +(Time t1, Time t2)
+        //}
+        private long[] ReturnPeriodValuesIn24HSystem(ulong period)
         {
-
+            long[] values = new long[3];
+            values[0] = (long)(period / 3600);
+            values[1] = (long)((period / 60) % 60);
+            values[2] = (long)(period % 60);
+            return values;
         }
-        public static Time operator -(Time t1, Time t2)
+        /// <summary>
+        /// Returns Time after passing inputed TimePeriod
+        /// </summary>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public Time AddTimePeriod(TimePeriod period)
         {
+            ulong currentTimeValue = (ulong)(Hours * 3600) + (ulong)(Minutes * 60) + Seconds;
+            currentTimeValue += (ulong)period.PeriodInSeconds;
+            long[] values = ReturnPeriodValuesIn24HSystem(currentTimeValue);
 
+            byte h = (byte)(values[0] % 24);
+            byte m = (byte)(values[1]);
+            byte s = (byte)(values[2]);
+            return new Time(h, m, s);
         }
-        //Time AddTimePeriod(TimePeriod period)
-        //{
-
-        //}
-        //static Time AddTimePeriod(Time t, TimePeriod period)
-        //{
-
-        //}
-        //Time SubstractTimePeriod(TimePeriod period)
-        //{
-
-        //}
+        /// <summary>
+        /// Returns new Time which is equal to old Time after inputed TimePeriod passed
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public static Time AddTimePeriod(Time t, TimePeriod period) => t.AddTimePeriod(period);
+        /// <summary>
+        /// Returns new time which is equal to Time turned back by inputed amount of TimePeriod
+        /// </summary>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public Time SubstractTimePeriod(TimePeriod period)
+        {
+            long periodToTurnBack = period.PeriodInSeconds;
+            long currentTimeInSeconds = Hours * 3600 + Minutes * 60 + Seconds;
+            long timeAfterSubstr = Math.Abs(currentTimeInSeconds - periodToTurnBack);
+            //(PeriodInSeconds / 3600):D2}:{((PeriodInSeconds / 60) % 60):D2}:{(PeriodInSeconds % 60)
+            long hoursToTurnBack = (timeAfterSubstr / 3600) % 24;
+            long minutesToTurnBack = (timeAfterSubstr / 60) % 60;
+            long secondsToTurnBack = timeAfterSubstr % 60;
+            long newTimeCounter = (24 * 3600);
+            long[] values = ReturnPeriodValuesIn24HSystem((ulong)(newTimeCounter - hoursToTurnBack - minutesToTurnBack - secondsToTurnBack));
+            byte h = (byte)(values[0] % 24);
+            byte m = (byte)(values[1]);
+            byte s = (byte)(values[2]);
+            return new Time(h, m, s);
+        }
         //static Time SubstractTimePeriod(Time t, TimePeriod period)
         //{
 
