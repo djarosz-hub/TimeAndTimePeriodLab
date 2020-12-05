@@ -100,7 +100,7 @@ namespace ClassLibrary
         public static bool operator >(TimePeriod t1, TimePeriod t2) => (t1.CompareTo(t2) > 0);
         public static bool operator >=(TimePeriod t1, TimePeriod t2) => (t1.CompareTo(t2) >= 0);
         /// <summary>
-        /// Returns new TimePeriod which value is equal to adding value of inputed TimePeriod to base TimePeriod, if final value is bigger than 9,223,372,036,854,775,807 or is equal to 0 exception would be thrown
+        /// Returns new TimePeriod which value is equal to adding value of inputed TimePeriod to base TimePeriod, if final value is greater than 9,223,372,036,854,775,807 or is equal to 0 exception would be thrown
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
@@ -114,7 +114,7 @@ namespace ClassLibrary
         /// <returns></returns>
         public static TimePeriod operator -(TimePeriod t1, TimePeriod t2) => t1.Substract(t2);
         /// <summary>
-        /// Returns new TimePeriod which value is equal to adding value of inputed TimePeriod to base TimePeriod, if final value is bigger than 9,223,372,036,854,775,807 or is equal to 0 exception would be thrown
+        /// Returns new TimePeriod which value is equal to adding value of inputed TimePeriod to base TimePeriod, if final value is greater than 9,223,372,036,854,775,807 or is equal to 0 exception would be thrown
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
@@ -126,7 +126,7 @@ namespace ClassLibrary
                 return new TimePeriod(PeriodInSeconds + other.PeriodInSeconds);
         }
         /// <summary>
-        /// Returns new TimePeriod which value is equal to adding two TimePeriods, if value is bigger than 9,223,372,036,854,775,807 or is equal to 0 exception would be thrown
+        /// Returns new TimePeriod which value is equal to adding two TimePeriods, if value is greater than 9,223,372,036,854,775,807 or is equal to 0 exception would be thrown
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
@@ -145,7 +145,7 @@ namespace ClassLibrary
                 return new TimePeriod();
         }
         /// <summary>
-        /// Returns new TimePeriod which value is equal to substraction of smaller TimePeriod from bigger TimePeriod, if both are equal returned TimePeriod would have defualt value (00:00:00)
+        /// Returns new TimePeriod which value is equal to substraction of lower TimePeriod from greater TimePeriod, if both are equal returned TimePeriod would have defualt value (00:00:00)
         /// </summary>
         /// <param name="t1"></param>
         /// <param name="t2"></param>
@@ -158,5 +158,25 @@ namespace ClassLibrary
                 return new TimePeriod(t2.PeriodInSeconds - t1.PeriodInSeconds);
             return new TimePeriod();
         }
+        /// <summary>
+        /// Multiplies TimePeriod by inputed multiplier, if output value is greater than 9,223,372,036,854,775,807 or multiplier is <= 0 returned TimePeriod would have default value (00:00:00)
+        /// </summary>
+        /// <param name="multiplier"></param>
+        /// <returns></returns>
+        public TimePeriod Multiply(int multiplier)
+        {
+            if ((PeriodInSeconds * multiplier) <= 0 || multiplier <= 0)
+                return new TimePeriod();
+            else
+                return new TimePeriod(PeriodInSeconds * multiplier);
+
+        }
+        /// <summary>
+        /// Multiplies inputed TimePeriod by inputed multiplier, if output value is greater than 9,223,372,036,854,775,807 or multiplier is <= 0 returned TimePeriod would have default value (00:00:00)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="multiplier"></param>
+        /// <returns></returns>
+        public static TimePeriod Multiply(TimePeriod t, int multiplier) => t.Multiply(multiplier);
     }
 }

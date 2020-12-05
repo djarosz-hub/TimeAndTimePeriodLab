@@ -154,7 +154,7 @@ namespace ClassLibrary
         /// <param name="tp"></param>
         /// <returns></returns>
         public static Time operator +(Time t, TimePeriod tp) => t.AddTimePeriod(tp);
- 
+
         //public static Time operator -(Time t1, TimePeriod t2)
         //{
 
@@ -197,23 +197,42 @@ namespace ClassLibrary
         /// <returns></returns>
         public Time SubstractTimePeriod(TimePeriod period)
         {
-            long periodToTurnBack = period.PeriodInSeconds;
-            long currentTimeInSeconds = Hours * 3600 + Minutes * 60 + Seconds;
-            long timeAfterSubstr = Math.Abs(currentTimeInSeconds - periodToTurnBack);
-            //(PeriodInSeconds / 3600):D2}:{((PeriodInSeconds / 60) % 60):D2}:{(PeriodInSeconds % 60)
-            long hoursToTurnBack = (timeAfterSubstr / 3600) % 24;
-            long minutesToTurnBack = (timeAfterSubstr / 60) % 60;
-            long secondsToTurnBack = timeAfterSubstr % 60;
-            long newTimeCounter = (24 * 3600);
-            long[] values = ReturnPeriodValuesIn24HSystem((ulong)(newTimeCounter - hoursToTurnBack - minutesToTurnBack - secondsToTurnBack));
-            byte h = (byte)(values[0] % 24);
-            byte m = (byte)(values[1]);
-            byte s = (byte)(values[2]);
-            return new Time(h, m, s);
-        }
-        //static Time SubstractTimePeriod(Time t, TimePeriod period)
-        //{
 
-        //}
+            long hoursToTurnBack = (period.PeriodInSeconds / 3600) % 24;
+            long minutesToTurnBack = (period.PeriodInSeconds / 60) % 60;
+            long secondsToTurnBack = period.PeriodInSeconds % 60;
+            long currentTimeInSeconds = Hours * 3600 + Minutes * 60 + seconds;
+            long prevTimeInSeconds = hoursToTurnBack * 3600 + minutesToTurnBack * 60 + secondsToTurnBack;
+            long time = 0;
+            long defaultTime = 24 * 3600;
+            byte h, m, s;
+            if (currentTimeInSeconds > prevTimeInSeconds)
+            {
+                time = currentTimeInSeconds - prevTimeInSeconds;
+                h = (byte)(time / 3600);
+                m = (byte)((time / 60) % 60);
+                s = (byte)(time % 60);
+                return new Time(h, m, s);
+            }
+            else if (prevTimeInSeconds > currentTimeInSeconds)
+            {
+                time = defaultTime - Math.Abs(prevTimeInSeconds - currentTimeInSeconds);
+                h = (byte)(time / 3600);
+                m = (byte)((time / 60) % 60);
+                s = (byte)(time % 60);
+                return new Time(h, m, s);
+            }
+            else
+                return new Time();
+            
+        }
+        /// <summary>
+        /// Returns new time which is equal to inputed Time turned back by inputed amount of TimePeriod
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public static Time SubstractTimePeriod(Time t, TimePeriod period) => t.SubstractTimePeriod(period);
+
     }
 }
