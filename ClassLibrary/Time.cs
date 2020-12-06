@@ -9,13 +9,12 @@ namespace ClassLibrary
     /// </summary>
     public struct Time : IEquatable<Time>, IComparable<Time>
     {
-        private readonly byte hours, minutes, seconds;
         ///<value>Gets number of hours in Time struct</value>
-        public byte Hours => hours;
+        public readonly byte Hours { get; }
         ///<value>Gets number of minutes in Time struct</value>
-        public byte Minutes => minutes;
+        public readonly byte Minutes { get; }
         ///<value>Gets number of seconds in Time struct</value>
-        public byte Seconds => seconds;
+        public readonly byte Seconds { get; }
         /// <summary>
         /// Correct range of input is: 0-23, other input value will cause exception to be thrown; minutes and seconds value will be 0 by default
         /// </summary>
@@ -24,9 +23,9 @@ namespace ClassLibrary
         {
             if (hours > 23 || hours < 0)
                 throw new Exception("input value out of range");
-            this.hours = hours;
-            this.minutes = 0;
-            this.seconds = 0;
+            this.Hours = hours;
+            this.Minutes = 0;
+            this.Seconds = 0;
         }
         /// <summary>
         /// Correct range of input is: 0-23 for hours, 0-59 for minutes, other input value will cause exception to be thrown; seconds value will be 0 by default
@@ -39,9 +38,9 @@ namespace ClassLibrary
                 throw new Exception("input value out of range");
             if (minutes > 59 || minutes < 0)
                 throw new Exception("input value out of range");
-            this.hours = hours;
-            this.minutes = minutes;
-            this.seconds = 0;
+            this.Hours = hours;
+            this.Minutes = minutes;
+            this.Seconds = 0;
         }
         /// <summary>
         /// Correct range of input values is: hours: 0-23; minutes 0-59; seconds: 0-59; passing values out of range will cause exception to be thrown
@@ -51,9 +50,9 @@ namespace ClassLibrary
         /// <param name="seconds"></param>
         public Time(byte hours, byte minutes, byte seconds)
         {
-            this.hours = verify(hours, 0, 23);
-            this.minutes = verify(minutes, 0, 59);
-            this.seconds = verify(seconds, 0, 59);
+            this.Hours = verify(hours, 0, 23);
+            this.Minutes = verify(minutes, 0, 59);
+            this.Seconds = verify(seconds, 0, 59);
             byte verify(byte val, int min, int max)
             {
                 if (val >= min && val <= max)
@@ -81,9 +80,9 @@ namespace ClassLibrary
             {
                 if (h >= 0 && h <= 23 && m >= 0 && m <= 59 && s >= 0 && s <= 59)
                 {
-                    this.hours = (byte)h;
-                    this.minutes = (byte)m;
-                    this.seconds = (byte)s;
+                    this.Hours = (byte)h;
+                    this.Minutes = (byte)m;
+                    this.Seconds = (byte)s;
                 }
                 else
                     throw new FormatException("expected format hh:mm:ss (0-23:0-59:0-59)");
@@ -148,17 +147,20 @@ namespace ClassLibrary
                 return false;
         }
         /// <summary>
-        /// Returns new Time which is equal to old Time after inputed TimePeriod passed
+        /// Can be applied only to type Time and TimePeriod, returns new Time which is equal to old Time after adding TimePeriod
         /// </summary>
         /// <param name="t"></param>
         /// <param name="tp"></param>
         /// <returns></returns>
         public static Time operator +(Time t, TimePeriod tp) => t.AddTimePeriod(tp);
+        /// <summary>
+        /// Can be applied only to type Time and TimePeriod, returns new time which is equal to inputed Time turned back by inputed amount of TimePeriod
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public static Time operator -(Time t, TimePeriod period) => t.SubstractTimePeriod(period);
 
-        //public static Time operator -(Time t1, TimePeriod t2)
-        //{
-
-        //}
         private long[] ReturnPeriodValuesIn24HSystem(ulong period)
         {
             long[] values = new long[3];
@@ -198,13 +200,13 @@ namespace ClassLibrary
         public Time SubstractTimePeriod(TimePeriod period)
         {
 
-            long hoursToTurnBack = (period.PeriodInSeconds / 3600) % 24;
-            long minutesToTurnBack = (period.PeriodInSeconds / 60) % 60;
-            long secondsToTurnBack = period.PeriodInSeconds % 60;
-            long currentTimeInSeconds = Hours * 3600 + Minutes * 60 + seconds;
-            long prevTimeInSeconds = hoursToTurnBack * 3600 + minutesToTurnBack * 60 + secondsToTurnBack;
-            long time = 0;
-            long defaultTime = 24 * 3600;
+            byte hoursToTurnBack = (byte)((period.PeriodInSeconds / 3600) % 24);
+            byte minutesToTurnBack = (byte)((period.PeriodInSeconds / 60) % 60);
+            byte secondsToTurnBack = (byte)(period.PeriodInSeconds % 60);
+            int currentTimeInSeconds = Hours * 3600 + Minutes * 60 + Seconds;
+            int prevTimeInSeconds = hoursToTurnBack * 3600 + minutesToTurnBack * 60 + secondsToTurnBack;
+            int time;
+            int defaultTime = 24 * 3600;
             byte h, m, s;
             if (currentTimeInSeconds > prevTimeInSeconds)
             {
