@@ -40,10 +40,6 @@ namespace ClassLibrary
         {
             if (hours < 0 || minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
                 throw new Exception("input values out of expected range");
-            Console.WriteLine(hours);
-            Console.WriteLine(minutes);
-            Console.WriteLine(seconds);
-
             periodInSeconds = ((long)hours * 3600) + (minutes * 60) + seconds;
         }
         /// <summary>
